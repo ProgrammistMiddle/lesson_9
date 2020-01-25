@@ -1,1 +1,85 @@
+class Durak:
+    def __init__(self,igrok,comp):
+        self.igrok = igrok
+        self.comp = comp
+        print('qwerty')
+       
+    def number(self):
+    	self.koloda = [6,7,8,9,10,'valet','dama','korol','tuz']
+    	self.all_koloda=[str(x)+'_P' for x in self.koloda ] + [str(x)+'_K' for x in self.koloda ]+[str(x)+'_B' for x in self.koloda ]+[str(x)+'_ch' for x in self.koloda ]
+				
+    def generator(list): 
+        for i in list: 
+            yield(i)
+        
+    def vash_hod():
+    	hod = input('vash hod : ')
+    	return hod 
+    	
+    def hod_comp(num):
+    	return	'hod comp:',num
+    		           
+    	                                 
+if __name__=='__main__':	
+	q = Durak('dima', 'computer')
+	q.number()
+	card=q.all_koloda
+	gen = Durak.generator(card)
+	igrun=[]
+	comp = []
+	count = 0
+	if 6 > count < 36:
+		for i in card:
+			while 6 > count < 36:
+				count+=1
+				igrun.append(next(gen))
+				comp.append(next(gen))
+	print( q.igrok,igrun,q.comp,comp)
+
+	def next():
+		def nexts():				
+			cvg = Durak.vash_hod()
+			while cvg not in igrun:
+				print ('no so card')
+				cvg = Durak.vash_hod()
+			else: igrun.remove(cvg)
+			if cvg == '6_P': 	
+		 		print(Durak.hod_comp('7_P'))
+		 		comp.remove('7_P')
+		 		print('vashi karty',igrun)
+		 		print (comp)
+		 		nexts()
+			elif cvg=='8_P':
+		 		print(Durak.hod_comp('9_P'))
+		 		comp.remove('9_P')
+		 		print('vashi karty',igrun)
+		 		print(comp)
+		 		nexts()
+			elif cvg == '10_P':
+		 		print(Durak.hod_comp('valet_P'))
+		 		comp.remove('valet_P')
+		 		print('vashi karty',igrun)
+		 		cvg = Durak.vash_hod()
+		 		nexts()
+			elif cvg =='dama_P':
+		 		print(Durak.hod_comp('korol_P'))
+		 		comp.remove('korol_P')
+		 		print('vashi karty',igrun)
+		 		cvg = Durak.vash_hod()
+		 		nexts()
+			elif cvg == '7_K':
+		 		print(Durak.hod_comp('8_K'))
+		 		comp.remove('8_K')
+		 		print('vashi karty',igrun)
+		 		cvg = Durak.vash_hod()
+		 		nexts()
+			elif cvg =='tuz_P':
+		 		comp.append('tuz_P')
+		 		print('computer have taken')
+		 		print (igrun)
+		 		print (comp)
+		 		nexts()		 
+		return nexts()		 	
+	next()
+	
 
