@@ -1,85 +1,76 @@
-class Durak:
-    def __init__(self,igrok,comp):
+import random
+class Durak: 
+    def __init__(self,igrok):
         self.igrok = igrok
-        self.comp = comp
-        print('qwerty')
-       
-    def number(self):
-    	self.koloda = [6,7,8,9,10,'valet','dama','korol','tuz']
-    	self.all_koloda=[str(x)+'_P' for x in self.koloda ] + [str(x)+'_K' for x in self.koloda ]+[str(x)+'_B' for x in self.koloda ]+[str(x)+'_ch' for x in self.koloda ]
-				
-    def generator(list): 
-        for i in list: 
-            yield(i)
+    
+    def card(self):
+        self.d = ['06','07','08','09','10','avalet','dama','korol','tuz']
+        self.masty_p=list(map(lambda x: x+'_p', self.d))
+        self.masty_k = list(map(lambda x: x+'_k',self.d))
+        self.masty_ch = list(map(lambda x: x+'_ch',self.d))
+        self.masty_b = list(map(lambda x: x+'_b',self.d))
+        self.allCard= self.masty_k+ self.masty_p+ self.masty_ch+ self.masty_b
+        random.shuffle(self.allCard) 
+        return self.allCard 
+            
+    def gen(self):
+        for i in Durak.card(self):
+            yield i
         
-    def vash_hod():
-    	hod = input('vash hod : ')
-    	return hod 
-    	
-    def hod_comp(num):
-    	return	'hod comp:',num
-    		           
-    	                                 
-if __name__=='__main__':	
-	q = Durak('dima', 'computer')
-	q.number()
-	card=q.all_koloda
-	gen = Durak.generator(card)
-	igrun=[]
-	comp = []
-	count = 0
-	if 6 > count < 36:
-		for i in card:
-			while 6 > count < 36:
-				count+=1
-				igrun.append(next(gen))
-				comp.append(next(gen))
-	print( q.igrok,igrun,q.comp,comp)
+    def playersCard(self):
+        self.genCard = Durak.gen(self)
+        self.igrokCard = []
+        self.compCard = []
+        while len(self.igrokCard)!=6 or len(self.compCard) != 6:            
+            if len(self.igrokCard)!=6:
+                self.igrokCard.append(next(self.genCard))
+                if len(self.igrokCard)!=6:
+                    self.compCard.append(next(self.genCard))
+            elif len(self.compCard)!=6:
+                self.compCard.append(next(self.genCard))
+        return self.igrokCard, self.compCard 
+     
+ 
+                                                                                                                                                 
+myIgrok= Durak('dima')
+myIgrok.playersCard()
+myIgrok.card()
+cart=myIgrok.igrokCard
+cartComp = myIgrok.compCard
+print (cartComp )
 
-	def next():
-		def nexts():				
-			cvg = Durak.vash_hod()
-			while cvg not in igrun:
-				print ('no so card')
-				cvg = Durak.vash_hod()
-			else: igrun.remove(cvg)
-			if cvg == '6_P': 	
-		 		print(Durak.hod_comp('7_P'))
-		 		comp.remove('7_P')
-		 		print('vashi karty',igrun)
-		 		print (comp)
-		 		nexts()
-			elif cvg=='8_P':
-		 		print(Durak.hod_comp('9_P'))
-		 		comp.remove('9_P')
-		 		print('vashi karty',igrun)
-		 		print(comp)
-		 		nexts()
-			elif cvg == '10_P':
-		 		print(Durak.hod_comp('valet_P'))
-		 		comp.remove('valet_P')
-		 		print('vashi karty',igrun)
-		 		cvg = Durak.vash_hod()
-		 		nexts()
-			elif cvg =='dama_P':
-		 		print(Durak.hod_comp('korol_P'))
-		 		comp.remove('korol_P')
-		 		print('vashi karty',igrun)
-		 		cvg = Durak.vash_hod()
-		 		nexts()
-			elif cvg == '7_K':
-		 		print(Durak.hod_comp('8_K'))
-		 		comp.remove('8_K')
-		 		print('vashi karty',igrun)
-		 		cvg = Durak.vash_hod()
-		 		nexts()
-			elif cvg =='tuz_P':
-		 		comp.append('tuz_P')
-		 		print('computer have taken')
-		 		print (igrun)
-		 		print (comp)
-		 		nexts()		 
-		return nexts()		 	
-	next()
-	
+print ('Ваши карты',cart)
+
+def find(names, name): 
+    count =[]
+    for i in names :
+        if i in cartComp:
+            if i > name:
+                count.append(i)
+    if len(count) == 0:
+        cartComp.append(name)
+        cart.remove(name)
+        print ('компьтер взял')
+    else: print('Ход компьютера',count[0])
+    
+               
+def hod(name):           
+    cart_p = myIgrok.masty_p
+    cart_k = myIgrok.masty_k 
+    cart_ch = myIgrok.masty_ch
+    cart_b = myIgrok.masty_b
+    if name in cart:
+        if '_p' in name:      
+            find(cart_p, name )
+        elif '_b' in name:
+            find(cart_b, name)
+        elif '_ch' in name:
+            find(cart_ch, name)
+        elif '_k' in name:
+            find(cart_k, name )
+    elif name not in cart:
+        print ('no card')
+hod(input('введите карту: '))
+
+
 
