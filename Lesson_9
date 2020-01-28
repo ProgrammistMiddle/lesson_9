@@ -2,75 +2,161 @@ import random
 class Durak: 
     def __init__(self,igrok):
         self.igrok = igrok
+        self.all_cards_on_table=[]
+        self.con=[]
+        self.otbivka=[]
+        self.igrokCard = []
+        self.compCard = []
+        self.genCard = Durak.gen(self)
+        self.counts=0
+        self.kozyr = []
     
     def card(self):
         self.d = ['06','07','08','09','10','avalet','dama','korol','tuz']
         self.masty_p=list(map(lambda x: x+'_p', self.d))
         self.masty_k = list(map(lambda x: x+'_k',self.d))
-        self.masty_ch = list(map(lambda x: x+'_ch',self.d))
+        self.masty_ch = list(map(lambda x: x+'_c',self.d))
         self.masty_b = list(map(lambda x: x+'_b',self.d))
         self.allCard= self.masty_k+ self.masty_p+ self.masty_ch+ self.masty_b
-        random.shuffle(self.allCard) 
+      #  random.shuffle(self.allCard)
         return self.allCard 
             
     def gen(self):
         for i in Durak.card(self):
             yield i
+      
+    def kozCart(self):
+        self.kozyr=next(self.genCard)
         
-    def playersCard(self):
-        self.genCard = Durak.gen(self)
-        self.igrokCard = []
-        self.compCard = []
-        while len(self.igrokCard)!=6 or len(self.compCard) != 6:            
-            if len(self.igrokCard)!=6:
+    def playersCard(self):        
+        while len(self.igrokCard)<6 or len(self.compCard)<6 and self.counts<36:            
+            if len(self.igrokCard)<6 and len(self.compCard)<6:
                 self.igrokCard.append(next(self.genCard))
-                if len(self.igrokCard)!=6:
-                    self.compCard.append(next(self.genCard))
-            elif len(self.compCard)!=6:
+                self.counts +=1
                 self.compCard.append(next(self.genCard))
-        return self.igrokCard, self.compCard 
+                self.counts +=1
+            elif len(self.compCard)<6:
+                self.compCard.append(next(self.genCard))
+                self.counts +=1
+            elif len(self.igrokCard)<6:
+                self.igrokCard.append(next(self.genCard))
+                self.counts +=1
+ 
      
  
                                                                                                                                                  
 myIgrok= Durak('dima')
 myIgrok.playersCard()
-myIgrok.card()
-cart=myIgrok.igrokCard
-cartComp = myIgrok.compCard
-print (cartComp )
+myIgrok.kozCart()
+print('козырь: ',myIgrok.kozyr)
+#myIgrok.playersCard()
+#myIgrok.gen()
+#myIgrok.playersCard(myIgrok.igrokCard, myIgrok.compCard)
+#cart=myIgrok.igrokCard
+#myIgrok.igrokCard.sort(key=lambda x:x[-1])
+print ('начальные карты',myIgrok.igrokCard)
 
-print ('Ваши карты',cart)
+#cartComp = myIgrok.compCard
+#myIgrok.compCard.sort(key=lambda x:x[-1])
+print (myIgrok.compCard )
 
-def find(names, name): 
-    count =[]
-    for i in names :
-        if i in cartComp:
-            if i > name:
-                count.append(i)
-    if len(count) == 0:
-        cartComp.append(name)
-        cart.remove(name)
+
+def takeCard(name):
+    for i in myIgrok.all_cards_on_table:
+        myIgrok.compCard.append(i)
+        myIgrok.igrokCard.remove(name) #del u igroka
+        myIgrok.playersCard()
         print ('компьтер взял')
-    else: print('Ход компьютера',count[0])
-    
-               
-def hod(name):           
-    cart_p = myIgrok.masty_p
-    cart_k = myIgrok.masty_k 
-    cart_ch = myIgrok.masty_ch
-    cart_b = myIgrok.masty_b
-    if name in cart:
-        if '_p' in name:      
-            find(cart_p, name )
-        elif '_b' in name:
-            find(cart_b, name)
-        elif '_ch' in name:
-            find(cart_ch, name)
-        elif '_k' in name:
-            find(cart_k, name )
-    elif name not in cart:
-        print ('no card')
-hod(input('введите карту: '))
+        print() #need
+        print('ваши карты',myIgrok.igrokCard)
+        print(myIgrok.compCard)
+        myIgrok.all_cards_on_table.clear()
+        myIgrok.con.clear()
+        myIgrok.otbivka.clear()
+        print() # need    
+        hod(input('введите любую вашу карту:'))
 
+
+
+
+
+
+
+def find(names, name):
+    myIgrok.all_cards_on_table.append(name)
+    #count =[] # карты которыми иожет отбиться компьютер
+    print('con',myIgrok.con)
+    print ('otbivka',myIgrok.otbivka)
+    print('all_cards_on_table',myIgrok.all_cards_on_table)
+   
+        
+    
+    
+    for i in names :
+        if i in myIgrok.compCard:
+            if i > name:
+                myIgrok.otbivka.append(i)
+    
+                
+# комп не может отбить первую карту
+    if len(myIgrok.otbivka) == 0 and len(myIgrok.con)==0:
+        takeCard(name)
+        
+        # комп не может отбить вторую карту    
+    elif len(myIgrok.otbivka)==0 and len(myIgrok.con)>0:
+    	takeCard(name)
+                
+                    
+# комп может отбить карту        
+    elif len(myIgrok.otbivka) > 0: 
+       # "con" карты без мастей     
+        myIgrok.con.append(name[:-2])
+        myIgrok.con.append(myIgrok.otbivka[0][:-2])
+        myIgrok.all_cards_on_table.append(myIgrok.otbivka[0])
+        print('Ход компьютера',myIgrok.otbivka[0])
+        myIgrok.igrokCard.remove(name)
+        myIgrok.compCard.remove(myIgrok.otbivka[0])
+        myIgrok.otbivka.clear()
+    print() #need
+    print ('Ваши карты',myIgrok.igrokCard)
+    print (myIgrok.compCard)
+    print ('con',myIgrok.con)
+    print ('Карты на столе', myIgrok.all_cards_on_table)
+    print()#need
+    hod(input('Введите next карту или bito: '))
+    
+              
+def hod(name):           
+    if name in myIgrok.igrokCard  and name[:-2] in  myIgrok.con:
+        hod1(name)
+    elif name in myIgrok.igrokCard and name[:-2] not in myIgrok.con:
+        print('этой карты нет на столе')
+        hod(input('введите любую вашу карту: ')) 
+    elif name=='bito':
+        myIgrok.playersCard()
+        print('Ваши карты',myIgrok.igrokCard)
+        hod(input('введите любую вашу карту: '))     
+    elif name not in myIgrok.igrokCard:
+        print ('У Вас нет такой карты')
+        hod(input('введите любую вашу карту: '))
+    
+        
+def hod1(name):
+    if '_p' in name:      
+        find( myIgrok.masty_p,name)
+    elif '_b' in name:
+        find( myIgrok.masty_b,name)
+    elif '_c' in name:
+        find(myIgrok.masty_ch,name)
+    elif '_k' in name:
+        find( myIgrok.masty_k,name)
+
+print() #need
+hod1(input('введите любую вашу карту: '))
+
+
+        
+
+    
 
 
