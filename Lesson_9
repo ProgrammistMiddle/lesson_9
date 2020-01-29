@@ -10,6 +10,7 @@ class Durak:
         self.genCard = Durak.gen(self)
         self.counts=0
         self.kozyr = []
+        self.nextCardComp=[]
     
     def card(self):
         self.d = ['06','07','08','09','10','avalet','dama','korol','tuz']
@@ -18,7 +19,7 @@ class Durak:
         self.masty_ch = list(map(lambda x: x+'_c',self.d))
         self.masty_b = list(map(lambda x: x+'_b',self.d))
         self.allCard= self.masty_k+ self.masty_p+ self.masty_ch+ self.masty_b
-      #  random.shuffle(self.allCard)
+        random.shuffle(self.allCard)
         return self.allCard 
             
     def gen(self):
@@ -53,11 +54,11 @@ print('козырь: ',myIgrok.kozyr)
 #myIgrok.gen()
 #myIgrok.playersCard(myIgrok.igrokCard, myIgrok.compCard)
 #cart=myIgrok.igrokCard
-#myIgrok.igrokCard.sort(key=lambda x:x[-1])
+myIgrok.igrokCard.sort(key=lambda x:x[-1])
 print ('начальные карты',myIgrok.igrokCard)
 
 #cartComp = myIgrok.compCard
-#myIgrok.compCard.sort(key=lambda x:x[-1])
+myIgrok.compCard.sort(key=lambda x:x[2])
 print (myIgrok.compCard )
 
 
@@ -74,7 +75,7 @@ def takeCard(name):
         myIgrok.con.clear()
         myIgrok.otbivka.clear()
         print() # need    
-        hod(input('введите любую вашу карту:'))
+        start(input('1введите любую вашу карту:'))
 
 
 
@@ -100,11 +101,23 @@ def find(names, name):
                 
 # комп не может отбить первую карту
     if len(myIgrok.otbivka) == 0 and len(myIgrok.con)==0:
-        takeCard(name)
+        for i in myIgrok.all_cards_on_table:
+            myIgrok.compCard.append(i)
+            myIgrok.igrokCard.remove(name) #del u igroka
+            myIgrok.playersCard()
+            print ('компьтер взял')
+            print() #need
+            print('ваши карты',myIgrok.igrokCard)
+            print(myIgrok.compCard)
+            myIgrok.all_cards_on_table.clear()
+            myIgrok.con.clear()
+            myIgrok.otbivka.clear()
+            print() # need    
+            start(input('5введите любую вашу карту:'))
         
         # комп не может отбить вторую карту    
     elif len(myIgrok.otbivka)==0 and len(myIgrok.con)>0:
-    	takeCard(name)
+        takeCard(name)
                 
                     
 # комп может отбить карту        
@@ -125,21 +138,149 @@ def find(names, name):
     print()#need
     hod(input('Введите next карту или bito: '))
     
+    
+    
+    
+#////////////////////////////////
+def checkCardIgrok(vvod, hodComp):
+    if vvod not in myIgrok.igrokCard:   
+        if vvod =='beru':
+            findMyHod(vvod,hodComp) 
+        elif vvod != 'beru':
+            print('3У Вас нет этой карты')
+            vvod= input('введите карту: ')
+    else: findMyHod(vvod,hodComp)
+
+
+    
+def computer():
+    print(myIgrok.compCard)
+    print('мои карты',myIgrok.igrokCard)
+    print('Компьютер ходит',myIgrok.compCard[0])
+    hodComp=myIgrok.compCard[0]
+    myIgrok.all_cards_on_table.append(myIgrok.compCard[0])
+    myIgrok.con.append(myIgrok.compCard[0][:-2])
+    myIgrok.compCard.remove(myIgrok.compCard[0])
+    myIgrok.igrokCard
+    vvod= input('введите карту или напишите: beru: ')
+    checkCardIgrok(vvod,hodComp)
+    
+    
+        
+    
+
+    
+    
+    
+
+        
+#///////////////////////////////////    
+def igrok():
+    print ('игрок',myIgrok.igrokCard,)
+    print('комп',myIgrok.compCard)
+    print('кон',myIgrok.con)
+    print ('стол',myIgrok.all_cards_on_table)
+def addDell(vvod):
+    myIgrok.con.append(vvod[:-2])
+    myIgrok.igrokCard.remove(vvod)
+    myIgrok.all_cards_on_table.append(vvod)
+#забирает карты    
+def takeTable(nameplayer):
+    for i in myIgrok.all_cards_on_table:
+        nameplayer.append(i)
+    if len(myIgrok.nextCardComp)!=0:
+        for i in myIgrok.nextCardComp:
+            nameplayer.append(i)
+    myIgrok.all_cards_on_table.clear()
+    myIgrok.con.clear()
+    myIgrok.playersCard()
+    computer()
+#/////////////////////////////////    
+#отбивание карт     
+def otbivkaCart(vvod,findMyHod=0,hodComp=0):
+    bita=[]
+    count=0
+    #определяем масть карты компьютера и определяем какими картами можно ее отбить
+    for i in findMyHod:
+        if hodComp<i:
+            bita.append(i)
+    #если есть у нас карты которыми мы можем отбить карту компа ставим 1
+    for i in bita:
+        if i == vvod:
+            count+=1
+    if count==0:        
+        print('отбейте карту правильно или введите: beru')
+        vvod=input('введите заново или напишите: beru: ')
+    addDell(vvod)
+    igrok()
+    nextHodComp()
+
+def nextHodComp(): 
+    cardComp=[]  #карта которую может подкинуть комп 
+    for i in myIgrok.con:
+        for a in myIgrok.compCard:  
+            if i in a:
+                cardComp.append(a)
+    print('cardComp',cardComp)
+    if len(cardComp) > 0:
+        print('компьютер подкидывает',cardComp[0])
+        myIgrok.con.append(cardComp[0][:-2])
+        myIgrok.compCard.remove(cardComp[0])
+        myIgrok.all_cards_on_table.append(cardComp[0])
+        vvod=input('отбейте карту или напишите: beru ')
+        #проверка могу ли я отбить карту
+        checkCardIgrok(vvod,cardComp[0])
+        #конец проверки
+        
+        
+    elif len(cardComp) <1: 
+        print('настала бита')
+        myIgrok.all_cards_on_table.clear()
+        myIgrok.con.clear()
+        myIgrok.playersCard()
+        igrok()
+        print ('со старта')
+        start(input('снова ваш ход: '))
+    
+    
+#ищет правильную масть
+def findMyHod(vvod,hodComp ):
+    if '_p' in vvod:      
+        otbivkaCart(vvod,myIgrok.masty_p,hodComp )
+    elif '_b' in vvod:
+        otbivkaCart(vvod,myIgrok.masty_b,hodComp )
+    elif '_c' in vvod:
+        otbivkaCart(vvod,myIgrok.masty_ch,hodComp  )
+    elif '_k' in vvod:
+        otbivkaCart(vvod,myIgrok.masty_k,hodComp )
+    elif vvod=='beru':
+        takeTable(myIgrok.igrokCard)
+        igrok()
+    else: print('нет такой масти')
+        
+    
+    
+    
+    
+    
               
-def hod(name):           
+def hod(name):
     if name in myIgrok.igrokCard  and name[:-2] in  myIgrok.con:
         hod1(name)
     elif name in myIgrok.igrokCard and name[:-2] not in myIgrok.con:
         print('этой карты нет на столе')
-        hod(input('введите любую вашу карту: ')) 
+        hod(input('2введите любую вашу карту: ')) 
     elif name=='bito':
         myIgrok.playersCard()
         print('Ваши карты',myIgrok.igrokCard)
-        hod(input('введите любую вашу карту: '))     
+        myIgrok.con.clear()
+        myIgrok.all_cards_on_table.clear()
+        computer()
     elif name not in myIgrok.igrokCard:
-        print ('У Вас нет такой карты')
-        hod(input('введите любую вашу карту: '))
+        print ('2У Вас нет такой карты')
+        hod(input('4введите любую вашу карту: '))
     
+
         
 def hod1(name):
     if '_p' in name:      
@@ -152,11 +293,14 @@ def hod1(name):
         find( myIgrok.masty_k,name)
 
 print() #need
-hod1(input('введите любую вашу карту: '))
-
+def start(start):
+    if start not in myIgrok.igrokCard:
+        print('1У вас нет этой карты')
+    else: hod1(start)
+start(input('5введите любую вашу карту: '))
 
         
 
-    
+
 
 
